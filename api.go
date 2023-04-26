@@ -2,6 +2,7 @@ package main
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -23,8 +24,8 @@ func (s *APIServer) Run() {
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
 
-	app.Post("/signup", s.signup)
-	app.Post("/signin", s.signin)
+	app.Post("/session", s.session)
+	app.Get("/auth", s.authMiddleware, s.auth)
 
 	app.Get("/posts", s.getPosts)
 	app.Post("/posts", s.authMiddleware, s.createPost)
@@ -35,34 +36,7 @@ func (s *APIServer) Run() {
 	app.Listen(s.listenAddr)
 }
 
-func (s *APIServer) signup(c *fiber.Ctx) error {
-	var u User
-	if err := c.BodyParser(&u); err != nil {
-		return err
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), 8)
-	if err != nil {
-		return err
-	}
-
-	u.Password = string(hashedPassword)
-
-	if err := s.store.CreateUser(&u); err != nil {
-		return err
-	}
-
-	token, err := s.createToken(u.ID)
-	if err != nil {
-		return err
-	}
-
-	return c.JSON(fiber.Map{
-		"token": token,
-	})
-}
-
-func (s *APIServer) signin(c *fiber.Ctx) error {
+func (s *APIServer) session(c *fiber.Ctx) error {
 	var u User
 	if err := c.BodyParser(&u); err != nil {
 		return err
@@ -73,8 +47,25 @@ func (s *APIServer) signin(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(u.Password)); err != nil {
-		return err
+	if user == nil {
+		hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10)
+		if err != nil {
+			return err
+		}
+
+		u.Password = string(hash)
+
+		if err := s.store.CreateUser(&u); err != nil {
+			return err
+		}
+
+		user = &u
+	} else {
+		if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(u.Password)); err != nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"message": "Invalid username or password",
+			})
+		}
 	}
 
 	token, err := s.createToken(user.ID)
@@ -82,9 +73,38 @@ func (s *APIServer) signin(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{
-		"token": token,
-	})
+	cookie := fiber.Cookie{
+		Name:    "token",
+		Value:   token,
+		Expires: time.Now().Add(24 * time.Hour),
+	}
+
+	c.Cookie(&cookie)
+
+	return c.JSON(user)
+}
+
+func (s *APIServer) auth(c *fiber.Ctx) error {
+	token := c.Cookies("token")
+	if token == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "Missing token",
+		})
+	}
+
+	userId, err := s.parseToken(token)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "Invalid token",
+		})
+	}
+
+	user, err := s.store.GetUserByID(userId)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(user)
 }
 
 func (s *APIServer) getPosts(c *fiber.Ctx) error {

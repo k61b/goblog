@@ -1,5 +1,5 @@
-import { usePosts } from '@/hooks/data'
-import { Post } from '@/components/Shared/Post'
+import { usePosts } from '@hooks/data'
+import { Post } from '@components/Shared/Post'
 
 function Posts() {
   const { posts } = usePosts()

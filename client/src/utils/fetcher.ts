@@ -1,9 +1,20 @@
 import axios, { AxiosRequestConfig } from 'axios'
 
-axios.defaults.baseURL = process.env.NEXT_PUBLIC_BASE_URL
-axios.defaults.withCredentials = false
+export const axiosInstance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
+  withCredentials: false,
+});
+
+axiosInstance.interceptors.response.use(
+  function (response) {
+    return response;
+  },
+  function (error) {
+    return Promise.reject(error.response.data);
+  }
+);
 
 export const fetcher = async (url: any, config?: AxiosRequestConfig) => {
-  const res = await axios.get(url, config)
+  const res = await axiosInstance.get(url, config)
   return res.data
 }

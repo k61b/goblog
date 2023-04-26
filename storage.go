@@ -13,6 +13,7 @@ type Storage interface {
 
 	CreateUser(u *User) error
 	GetUserByUsername(username string) (*User, error)
+	GetUserByID(id int) (*User, error)
 
 	CreatePost(p *Post) error
 	GetPostByID(id int) (*Post, error)
@@ -79,6 +80,22 @@ func (ps *PostgresStorage) GetUserByUsername(username string) (*User, error) {
 	row := ps.db.QueryRow(`
 		SELECT id, username, password FROM users WHERE username = $1;
 	`, username)
+
+	u := &User{}
+	err := row.Scan(&u.ID, &u.Username, &u.Password)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return u, nil
+}
+
+func (ps *PostgresStorage) GetUserByID(id int) (*User, error) {
+	row := ps.db.QueryRow(`
+		SELECT id, username, password FROM users WHERE id = $1;
+	`, id)
 
 	u := &User{}
 	err := row.Scan(&u.ID, &u.Username, &u.Password)

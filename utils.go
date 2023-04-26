@@ -42,10 +42,10 @@ func (s *APIServer) parseToken(token string) (int, error) {
 }
 
 func (s *APIServer) authMiddleware(c *fiber.Ctx) error {
-	token := c.Get("Authorization")
+	token := c.Cookies("token")
 	if token == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"message": "Missing Authorization header",
+			"message": "Invalid token",
 		})
 	}
 
