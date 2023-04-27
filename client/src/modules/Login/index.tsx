@@ -1,11 +1,9 @@
 import { createSession } from '@services/index'
-import { useAuth } from '@hooks/data'
 import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 export default function Login() {
-  const { mutateUser } = useAuth()
   const router = useRouter()
   const formik = useFormik({
     initialValues: {
@@ -17,10 +15,8 @@ export default function Login() {
       password: Yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
-      console.log(values)
       const { username, password } = values
       await createSession({ username, password })
-      mutateUser()
       router.push('/')
     },
   })

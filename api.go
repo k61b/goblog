@@ -20,8 +20,8 @@ func (s *APIServer) Run() {
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowHeaders: "Origin, Content-Type, Accept",
+		AllowOrigins:     goDotEnvVariable("ALLOWED_ORIGINS"),
+		AllowCredentials: true,
 	}))
 
 	app.Post("/session", s.session)
@@ -76,9 +76,9 @@ func (s *APIServer) session(c *fiber.Ctx) error {
 	cookie := fiber.Cookie{
 		Name:    "token",
 		Value:   token,
-		Expires: time.Now().Add(24 * time.Hour),
+		Path:    "/",
+		Expires: time.Now().Add(time.Hour * 24),
 	}
-
 	c.Cookie(&cookie)
 
 	return c.JSON(user)
