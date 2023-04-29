@@ -1,4 +1,5 @@
 import { useAuth } from '@hooks/data'
+import { TfiWrite } from 'react-icons/tfi'
 
 function Header() {
   const { user } = useAuth()
@@ -9,13 +10,13 @@ function Header() {
         <a href="/" className="p-4">
           Home
         </a>
-        <a href="/about" className="p-4">
-          About
-        </a>
       </div>
       <div className="flex items-center">
         {user ? (
           <>
+            <a href="/write" className="p-4 bg-white rounded-lg">
+              <TfiWrite />
+            </a>
             <span className="p-4">{user.username}</span>
             <a href="/logout" className="p-4">
               Logout
