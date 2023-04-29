@@ -7,7 +7,9 @@ function Posts() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       {posts?.map((post) => (
-        <Post key={post.id} post={post} />
+        <a key={post.id} href={`/post/${post.id}`}>
+          <Post post={post} />
+        </a>
       ))}
     </div>
   )

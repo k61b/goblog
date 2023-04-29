@@ -1,4 +1,4 @@
-import { Post } from '@/models/types'
+import { Post } from '@models/types'
 import useSWR from 'swr'
 
 export function usePosts() {

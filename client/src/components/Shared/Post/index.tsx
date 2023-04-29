@@ -1,15 +1,15 @@
-import { Post } from '@/models/types'
+import { Post } from '@models/types'
 import Image from 'next/image'
 
 type Props = {
-  post: Post
+  post?: Post
 }
 
 export function Post({ post }: Props) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <div className="flex flex-col items-center justify-center">
-        <a href={`/posts/${post.id}`}>
+      {post && (
+        <div className="flex flex-col items-center justify-center">
           <Image
             src={'https://picsum.photos/500/500'}
             alt={post.title}
@@ -19,8 +19,8 @@ export function Post({ post }: Props) {
           />
           <h1 className="text-4xl font-bold">{post.title}</h1>
           <p className="text-xl">{post.content}</p>
-        </a>
-      </div>
+        </div>
+      )}
     </div>
   )
 }

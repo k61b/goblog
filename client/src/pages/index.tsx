@@ -1,4 +1,4 @@
-import Home from '@/modules/Home'
+import Home from '@modules/Home'
 import Head from 'next/head'
 
 function HomePage() {
