@@ -2,8 +2,7 @@ import Posts from './Posts'
 
 function Home() {
   return (
-    <div>
-      <h1>Home</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Posts />
     </div>
   )

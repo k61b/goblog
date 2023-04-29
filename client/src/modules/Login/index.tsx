@@ -35,7 +35,7 @@ export default function Login() {
           placeholder="Username"
           onChange={formik.handleChange}
           value={formik.values.username}
-          className="border border-gray-300 rounded-md p-2 mb-2"
+          className="border border-gray-300 rounded-md p-2 mb-2 text-black"
         />
         {formik.errors.username ? <div>{formik.errors.username}</div> : null}
         <input
@@ -45,10 +45,10 @@ export default function Login() {
           placeholder="Password"
           onChange={formik.handleChange}
           value={formik.values.password}
-          className="border border-gray-300 rounded-md p-2 mb-2"
+          className="border border-gray-300 rounded-md p-2 mb-2 text-black"
         />
         {formik.errors.password ? <div>{formik.errors.password}</div> : null}
-        <button type="submit" className="bg-blue-500 text-white rounded-md p-2">
+        <button type="submit" className="bg-blue-500 rounded-md p-2 text-black">
           Login
         </button>
       </form>

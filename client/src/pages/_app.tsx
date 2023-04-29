@@ -1,5 +1,6 @@
-import DefaultLayout from '@/components/Layout/default'
-import { fetcher } from '@/utils/fetcher'
+import '@styles/globals.css'
+import DefaultLayout from '@components/Layout/default'
+import { fetcher } from '@utils/fetcher'
 import { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import { ReactElement, ReactNode } from 'react'
